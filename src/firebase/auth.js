@@ -1,5 +1,5 @@
 
-import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth";
 import { auth } from "./config";
 
 // função assíncrona == o resultado não é obtido de imediato
@@ -28,4 +28,11 @@ export async function loginEmailSenha(email, senha) {
     return resultado.user;
 }
 
+export async function logout() {
+    // Deslogar o usuário atual do firebase:
+    await signOut(auth);
+}
+
 // quando os valores estão em um banco de dados, para capturar estes valores é necessário usar essa estrutura
+// async -> chamada para o firebase
+// auth vem do config, todas as funções precisam para funcionar e redirecionar pro firebase
