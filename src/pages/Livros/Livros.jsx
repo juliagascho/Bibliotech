@@ -1,19 +1,33 @@
 import { useEffect, useState } from "react";
 import { Button, Container, Table } from "react-bootstrap";
+import { toast } from "react-hot-toast";
 import { Link } from "react-router-dom";
-import { Loader } from "../../components/Menu/Loader/Loader";
-import { getLivros } from "../../firebase/livros";
+import { Loader } from "../../components/Loader/Loader";
+import { deleteLivro, getLivros } from "../../firebase/livros";
+import "./Livros.css";
 
 export function Livros() {
   const [livros, setLivros] = useState(null);
 
   useEffect(() => {
+    initializeTable();
+  }, []);
+
+  function initializeTable() {
     //buscar info no bd
     // const busca = await getLivros();
-    getLivros().then((busca) => {
-      setLivros(busca);
+    getLivros().then((resultados) => {
+      setLivros(resultados);
     });
-  }, []);
+  }
+
+  // useEffect(() => {
+  //   //buscar info no bd
+  //   // const busca = await getLivros();
+  //   getLivros().then((busca) => {
+  //     setLivros(busca);
+  //   });
+  // }, []);
 
   // useEffect(async () => {
   //     const busca = await getLivros();
@@ -21,6 +35,26 @@ export function Livros() {
   //     // buscar informações do campo
   //   }, []);
 
+  //window.confirm abre caixinha para confirmar
+  function onDeleteLivro(id, titulo) {
+    const deletar = window.confirm(
+      `Tem certeza que deseja excluir o livro ${titulo}?`
+    );
+    if (deletar) {
+      deleteLivro(id).then(() => {
+        toast.success(`${titulo} deletado com sucesso!`, {
+          duration: 2000,
+          position: "bottom-right"
+        });
+        initializeTable();
+      });
+    } else {
+      toast.success("Operação cacelada!", {
+        duration: 2000
+      });
+    }
+  }
+  
   return (
     <div className="livros">
       <Container>
@@ -31,9 +65,9 @@ export function Livros() {
           </Button>
         </div>
         <hr />
-        {livros === null ? 
+        {livros === null ? (
           <Loader />
-         : (
+        ) : (
           <Table striped bordered hover>
             <thead>
               <tr>
@@ -41,6 +75,7 @@ export function Livros() {
                 <th>Autor</th>
                 <th>Categoria</th>
                 <th>Capa</th>
+                <th>Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -53,6 +88,25 @@ export function Livros() {
                     <td>{livro.isbn}</td>
                     <td>
                       <img src={livro.urlCapa} alt={livro.titulo} />
+                    </td>
+                    <td>
+                      <Button
+                        as={Link}
+                        to={`/livros/editar/${livro.id}`}
+                        variant="warning"
+                        size="sm"
+                        className="me-2"
+                      >
+                        <i className="bi bi-pencil-fill"></i>
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => onDeleteLivro(livro.id, livro.titulo)}
+                      >
+                        <i className="bi bi-trash3-fill"></i>
+                      </Button>
+                      {/* precisa colocar a arrow function porque senão ele nao deixa colocar parenteses para passar o parametro. Para executar função dentro do onclick, ou faz a função antes e chama o nome da função aqui, ou faz uma arrow function dentro do onClick */}
                     </td>
                   </tr>
                 );

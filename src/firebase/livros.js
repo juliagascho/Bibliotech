@@ -1,4 +1,4 @@
-import { addDoc, getDocs } from "firebase/firestore";
+import { addDoc, deleteDoc, doc, getDoc, getDocs, updateDoc } from "firebase/firestore";
 import { livrosCollection } from "./collections";
 
 export async function addLivro(data) {
@@ -15,3 +15,17 @@ export async function getLivros() {
 }
 
 // toda função assíncrona precisa ter await antes dela
+
+export async function getLivro(id) {
+    const document = await getDoc(doc(livrosCollection, id));
+    return{...document.data(), id: document.id}
+}
+
+export async function updateLivro(id, novoLivro) {
+    await updateDoc(doc(livrosCollection, id), novoLivro)
+}
+//updatedoc atualiza o valor
+
+export async function deleteLivro(id) {
+    await deleteDoc(doc(livrosCollection, id))
+}
