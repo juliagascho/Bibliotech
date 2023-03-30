@@ -2,7 +2,7 @@ import { Button, Container, Form } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router";
-import { addLivro } from "../../firebase/livros";
+import { addLivro, uploadCapaLivro } from "../../firebase/livros";
 
 export function AdicionarLivro() {
 
@@ -10,10 +10,25 @@ export function AdicionarLivro() {
     const navigate = useNavigate();
 
     function onSubmit(data) {
-        addLivro(data)
-        // salvar no banco de dados
-        toast.success("Livro adicionado com sucesso!", { duration: 2000, position: "botton-right" })
-        navigate("/livros")
+        const imagem = data.imagem[0]; //imagem nome do campo
+        if(imagem) {
+            //se a imagem existir, vai fazer o upload
+            const toastId = toast.loading("Upload da imagem...", {position: "top-right"});
+            uploadCapaLivro(imagem).then(url => {
+                toast.dismiss(toastId);
+                data.urlCapa = url;
+                delete data.imagem;
+                addLivro(data)
+                // salvar no banco de dados
+                    toast.success("Livro adicionado com sucesso!", { duration: 2000, position: "botton-right" })
+                    navigate("/livros")
+            })            
+        } else {
+            delete data.imagem;
+            addLivro(data)
+                toast.success("Livro adicionado com sucesso!", { duration: 2000, position: "botton-right" })
+                navigate("/livros")
+        }       
     }
 
     return (
@@ -53,10 +68,7 @@ export function AdicionarLivro() {
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="formBasicEmail">
                         <Form.Label>Imagem da capa</Form.Label>
-                        <Form.Control className={errors.urlCapa && "is-invalid"} type="url" {...register("urlCapa", {required: "Endereço da capa é obrigatório"})} />
-                        <Form.Text className="text-danger">
-                            {errors.urlCapa?.message}
-                        </Form.Text>
+                        <Form.Control type="file" accept=".png,.jpg,.jpeg,.gif" {...register("imagem")} />
                     </Form.Group>
                     <Button type="submit" variant="success">Adicionar</Button>
                 </Form>

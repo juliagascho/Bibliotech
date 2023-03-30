@@ -21,20 +21,6 @@ export function Livros() {
     });
   }
 
-  // useEffect(() => {
-  //   //buscar info no bd
-  //   // const busca = await getLivros();
-  //   getLivros().then((busca) => {
-  //     setLivros(busca);
-  //   });
-  // }, []);
-
-  // useEffect(async () => {
-  //     const busca = await getLivros();
-  //     setLivros(busca)
-  //     // buscar informações do campo
-  //   }, []);
-
   //window.confirm abre caixinha para confirmar
   function onDeleteLivro(id, titulo) {
     const deletar = window.confirm(
